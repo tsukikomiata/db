@@ -46,18 +46,13 @@ class Table(QMainWindow, Ui_MainWindow):
 
     def search(self):
         options = dict()
-        print("начало поиска?")
         options['title'] = self.title.text()
-        print("начало поиска?")
         options['genre'] = self.genre.currentText()
-        print("начало поиска?")
         options['year'] = self.year.currentText()
         options['dur_min'] = self.duration_min.value()
         options['dur_max'] = self.duration_max.value()
-
         new_films = self.db.get_films(options)
         self.fill_table(new_films)
-        print("ставлю на поиск")
 
     def changed(self, item: QTableWidgetItem):
         if not self.editing:
@@ -163,8 +158,8 @@ class AddNewFilm(QDialog, Ui_Dialog):
 
     def add_film(self):
         title = self.title.text()
-        year = self.year_spinBox.value()
-        duration = self.time_spinBox.value()
+        year = self.year_spinbox.value()
+        duration = self.time_spinbox.value()
         genre = self.genre.currentText()
         values = {'title': title, 'year': year, 'genre': genre, 'duration': duration}
         self.db.add_new_film(values)
