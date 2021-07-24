@@ -4,8 +4,7 @@ import sqlite3
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QTableWidgetItem, QDialog
 from try_db import Ui_MainWindow
-
-# from dialog_window_ui import Ui_Dialog
+from dialog import Ui_Dialog
 
 
 class Table(QMainWindow, Ui_MainWindow):
@@ -134,32 +133,32 @@ class Db:
                 else:
                     self.selected_films.remove(val_id)
 
-    # def add_new_film(self):
-    #     a = AddNewFilm()
-    #     a.show()
-    #     a.exec()
-    #     self.fill_table(self.db.all_films())
+    def add_new_film(self):
+        a = AddNewFilm()
+        a.show()
+        a.exec()
+        self.fill_table(self.db.all_films())
 
     def delete_films(self):
         self.db.delete_films(self.selected_films)
         self.fill_table(self.db.all_films())
 
 
-# # class AddNewFilm(QDialog, Ui_Dialog):
-#     def __init__(self):
-#         super().__init__()
-#         self.setupUi(self)
-#         self.db = Db()
-#         self.comboBox.addItems(list(self.db.all_gen().values()))
-#         self.buttonBox.accepted.connect(self.add_film)
-#
-#     def add_film(self):
-#         title = self.lineEdit.text()
-#         year = self.dialog_year_spinbox.value()
-#         duration = self.spinBox_2.value()
-#         genre = self.comboBox.currentText()
-#         values = {'title': title, 'year': year, 'genre': genre, 'duration': duration}
-#         self.db.add_new_film(values)
+class AddNewFilm(QDialog, Ui_Dialog):
+    def __init__(self):
+        super().__init__()
+        self.setupUi(self)
+        self.db = Db()
+        self.comboBox.addItems(list(self.db.all_gen().values()))
+        self.buttonBox.accepted.connect(self.add_film)
+
+    def add_film(self):
+        title = self.name.text()
+        year = self.year_spinbox.value()
+        duration = self.time_spinbox.value()
+        genre = self.genre.currentText()
+        values = {'title': title, 'year': year, 'genre': genre, 'duration': duration}
+        self.db.add_new_film(values)
 
 
 if __name__ == '__main__':
