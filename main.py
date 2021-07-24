@@ -54,6 +54,34 @@ class Table(QMainWindow, Ui_MainWindow):
         new_films = self.db.get_films(options)
         self.fill_table(new_films)
 
+    def changed(self, item: QTableWidgetItem):
+        if not self.editing:
+            row = item.row()
+            types = {0: 'checkbox', 1: 'id', 2: 'title', 3: 'year', 4: 'genre', 5: 'duration'}
+            value_type = types[item.column()]
+            if value_type != 'checkbox':
+                new_val = self.table_films.item(row, item.column()).text()
+                val_id = self.table_films.item(row, 1).text()
+                self.db.update_value(value_type, new_val, val_id)
+            else:
+                val_id = self.table_films.item(row, 1).text()
+                if self.table_films.item(row, item.column()).checkState():
+                    self.selected_films.append(val_id)
+                else:
+                    self.selected_films.remove(val_id)
+
+    def add_new_film(self):
+        a = AddNewFilm()
+        a.show()
+        a.exec()
+        self.fill_table(self.db.all_films())
+
+    def delete_films(self):
+        self.db.delete_films(self.selected_films)
+        self.fill_table(self.db.all_films())
+
+# -----------------------------------------
+
 
 class Db:
     def __init__(self):
@@ -72,7 +100,8 @@ class Db:
         return self.all_gen()[genre_id]
 
     def get_id_genre(self, genre: str):
-        return list(self.all_gen().keys())[list(self.all_gen().values()).index(genre)]
+        new_dict = {val: key for key, val in self.all_genres().items()}
+        return new_dict[genre]
 
     def get_films(self, options: dict):
         title = options['title'] + '%'
@@ -117,32 +146,6 @@ class Db:
     def max_id(self):
         return self.__cursor.execute("""SELECT MAX(id) FROM films""").fetchone()[0]
 
-    def changed(self, item: QTableWidgetItem):
-        if not self.editing:
-            row = item.row()
-            types = {0: 'checkbox', 1: 'id', 2: 'title', 3: 'year', 4: 'genre', 5: 'duration'}
-            value_type = types[item.column()]
-            if value_type != 'checkbox':
-                new_val = self.table_films.item(row, item.column()).text()
-                val_id = self.table_films.item(row, 1).text()
-                self.db.update_value(value_type, new_val, val_id)
-            else:
-                val_id = self.table_films.item(row, 1).text()
-                if self.table_films.item(row, item.column()).checkState():
-                    self.selected_films.append(val_id)
-                else:
-                    self.selected_films.remove(val_id)
-
-    def add_new_film(self):
-        a = AddNewFilm()
-        a.show()
-        a.exec()
-        self.fill_table(self.db.all_films())
-
-    def delete_films(self):
-        self.db.delete_films(self.selected_films)
-        self.fill_table(self.db.all_films())
-
 
 class AddNewFilm(QDialog, Ui_Dialog):
     def __init__(self):
@@ -160,6 +163,7 @@ class AddNewFilm(QDialog, Ui_Dialog):
         values = {'title': title, 'year': year, 'genre': genre, 'duration': duration}
         self.db.add_new_film(values)
 
+# --------------------------------------------------
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
