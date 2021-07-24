@@ -46,13 +46,18 @@ class Table(QMainWindow, Ui_MainWindow):
 
     def search(self):
         options = dict()
+        print("начало поиска?")
         options['title'] = self.title.text()
+        print("начало поиска?")
         options['genre'] = self.genre.currentText()
+        print("начало поиска?")
         options['year'] = self.year.currentText()
         options['dur_min'] = self.duration_min.value()
         options['dur_max'] = self.duration_max.value()
+
         new_films = self.db.get_films(options)
         self.fill_table(new_films)
+        print("ставлю на поиск")
 
     def changed(self, item: QTableWidgetItem):
         if not self.editing:
@@ -108,7 +113,7 @@ class Db:
         year = options['year'] if options['year'] != '' else 0
         genre = self.get_id_genre(options['genre']) if options['genre'] != '' else 0
         dur_max = options['dur_max']
-
+        print("а я ставлю на гет фильм перед поиском")
         select_str = """SELECT * FROM films WHERE title like ?"""
         values = [title]
         if year:
@@ -121,7 +126,7 @@ class Db:
             select_str += """ AND duration BETWEEN ? AND ?"""
             values.append(options['dur_min'])
             values.append(dur_max)
-        print(select_str)
+        print("а я - на конец гета")
         return self.__cursor.execute(select_str, tuple(values)).fetchall()
 
     def update_value(self, old_val: str, new_val: str, film_id: int):
@@ -157,7 +162,7 @@ class AddNewFilm(QDialog, Ui_Dialog):
         self.buttonBox.accepted.connect(self.add_film)
 
     def add_film(self):
-        title = self.name.text()
+        title = self.title.text()
         year = self.year_spinbox.value()
         duration = self.time_spinbox.value()
         genre = self.genre.currentText()
