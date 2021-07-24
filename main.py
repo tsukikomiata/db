@@ -72,10 +72,10 @@ class Db:
     def get_genre(self, genre_id: int):
         return self.all_gen()[genre_id]
 
-    def get_id_genre(self, genre:str):
+    def get_id_genre(self, genre: str):
         return list(self.all_gen().keys())[list(self.all_gen().values()).index(genre)]
 
-    def get_films(self, options:dict):
+    def get_films(self, options: dict):
         title = options['title'] + '%'
         year = options['year'] if options['year'] != '' else 0
         genre = self.get_id_genre(options['genre']) if options['genre'] != '' else 0
