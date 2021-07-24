@@ -149,7 +149,7 @@ class AddNewFilm(QDialog, Ui_Dialog):
         super().__init__()
         self.setupUi(self)
         self.db = Db()
-        self.comboBox.addItems(list(self.db.all_gen().values()))
+        self.genre.addItems(list(self.db.all_gen().values()))
         self.buttonBox.accepted.connect(self.add_film)
 
     def add_film(self):
