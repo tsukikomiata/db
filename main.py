@@ -16,9 +16,9 @@ class Table(QMainWindow, Ui_MainWindow):
         self.table_films.setColumnCount(6)
         self.table_films.setHorizontalHeaderLabels(['choose', 'id', 'title', 'year', 'genre', 'duration'])
         self.btn_search.clicked.connect(self.search)
-        self.fill_table(self.db.all_films)
-        self.genre_choose.addItems([''] + list(self.db.all_genres.values()))
-        self.years = [str(i) for i in range(self.db.min_max_year[0], self.db.min_max_year[1] + 1)]
+        self.fill_table(self.db.all_films())
+        self.genre_choose.addItems([''] + list(self.db.all_gen().values()))
+        self.years = [str(i) for i in range(self.db.min_max_year()[0], self.db.min_max_year()[1] + 1)]
         self.year_choose.addItems([''] + self.years)
         self.duration_max.setMaximum(200)
         self.duration_min.setMaximum(199)
@@ -30,19 +30,19 @@ class Table(QMainWindow, Ui_MainWindow):
 
     def fill_table(self, film_list: list):
         self.editing = True
-        self.films_table.setRowCount(len(film_list))
+        self.table_films.setRowCount(len(film_list))
         for i in range(len(film_list)):
             genre = self.db.get_id_genre(film_list[i][3])
             checkbox = QTableWidgetItem()
             checkbox.setCheckState(False)
-            self.films_table.setItem(i, 0, checkbox)
+            self.table_films.setItem(i, 0, checkbox)
             id_item = QTableWidgetItem(str(film_list[i][0]))
             id_item.setFlags(Qt.ItemIsEnabled)
-            self.films_table.setItem(i, 1, id_item)
-            self.films_table.setItem(i, 2, QTableWidgetItem(str(film_list[i][1])))
-            self.films_table.setItem(i, 3, QTableWidgetItem(str(film_list[i][2])))
-            self.films_table.setItem(i, 4, QTableWidgetItem(genre))
-            self.films_table.setItem(i, 5, QTableWidgetItem(str(film_list[i][4])))
+            self.table_films.setItem(i, 1, id_item)
+            self.table_films.setItem(i, 2, QTableWidgetItem(str(film_list[i][1])))
+            self.table_films.setItem(i, 3, QTableWidgetItem(str(film_list[i][2])))
+            self.table_films.setItem(i, 4, QTableWidgetItem(genre))
+            self.table_films.setItem(i, 5, QTableWidgetItem(str(film_list[i][4])))
         self.editing = False
 
     def search(self):
@@ -54,7 +54,6 @@ class Table(QMainWindow, Ui_MainWindow):
         options['dur_max'] = self.duration_max.value()
         new_films = self.db.get_films(options)
         self.fill_table(new_films)
-
 
 
 class Db:
@@ -70,11 +69,11 @@ class Db:
     def all_films(self):
         return self.__cursor.execute("""SELECT * FROM films""").fetchall()
 
-    def get_genre(self, genre_id:int):
-        return self.all_gen[genre_id]
+    def get_genre(self, genre_id: int):
+        return self.all_gen()[genre_id]
 
     def get_id_genre(self, genre:str):
-        return list(self.all_gen.keys())[list(self.all_gen.values()).index(genre)]
+        return list(self.all_gen().keys())[list(self.all_gen().values()).index(genre)]
 
     def get_films(self, options:dict):
         title = options['title'] + '%'
@@ -102,7 +101,7 @@ class Db:
 
     def add_new_film(self, values: dict):
         values['genre'] = self.get_id_genre(values['genre'])
-        values = tuple([self.max_id + 1] + list(values.values()))
+        values = tuple([self.max_id() + 1] + list(values.values()))
         self.__cursor.execute("""INSERT INTO films VALUES(?)""", tuple(values))
         self.__connect.commit()
 
@@ -135,23 +134,23 @@ class Db:
                 else:
                     self.selected_films.remove(val_id)
 
-    def add_new_film(self):
-        a = AddNewFilm()
-        a.show()
-        a.exec()
-        self.fill_table(self.db.all_films)
+    # def add_new_film(self):
+    #     a = AddNewFilm()
+    #     a.show()
+    #     a.exec()
+    #     self.fill_table(self.db.all_films())
 
     def delete_films(self):
         self.db.delete_films(self.selected_films)
-        self.fill_table(self.db.all_films)
+        self.fill_table(self.db.all_films())
 
 
 # # class AddNewFilm(QDialog, Ui_Dialog):
 #     def __init__(self):
 #         super().__init__()
 #         self.setupUi(self)
-#         self.db = Database()
-#         self.comboBox.addItems(list(self.db.all_genres.values()))
+#         self.db = Db()
+#         self.comboBox.addItems(list(self.db.all_gen().values()))
 #         self.buttonBox.accepted.connect(self.add_film)
 #
 #     def add_film(self):
