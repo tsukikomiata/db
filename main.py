@@ -16,9 +16,9 @@ class Table(QMainWindow, Ui_MainWindow):
         self.table_films.setHorizontalHeaderLabels(['choose', 'id', 'title', 'year', 'genre', 'duration'])
         self.btn_search.clicked.connect(self.search)
         self.fill_table(self.db.all_films())
-        self.genre_choose.addItems([''] + list(self.db.all_gen().values()))
+        self.genre.addItems([''] + list(self.db.all_gen().values()))
         self.years = [str(i) for i in range(self.db.min_max_year()[0], self.db.min_max_year()[1] + 1)]
-        self.year_choose.addItems([''] + self.years)
+        self.year.addItems([''] + self.years)
         self.duration_max.setMaximum(200)
         self.duration_min.setMaximum(199)
         self.table_films.itemChanged.connect(self.changed)
@@ -31,7 +31,7 @@ class Table(QMainWindow, Ui_MainWindow):
         self.editing = True
         self.table_films.setRowCount(len(film_list))
         for i in range(len(film_list)):
-            genre = self.db.get_id_genre(film_list[i][3])
+            genre = self.db.get_genre(film_list[i][3])
             checkbox = QTableWidgetItem()
             checkbox.setCheckState(False)
             self.table_films.setItem(i, 0, checkbox)
@@ -47,8 +47,8 @@ class Table(QMainWindow, Ui_MainWindow):
     def search(self):
         options = dict()
         options['title'] = self.title_insert.text()
-        options['genre'] = self.genre_choose.currentText()
-        options['year'] = self.year_choose.currentText()
+        options['genre'] = self.genre.currentText()
+        options['year'] = self.year.currentText()
         options['dur_min'] = self.duration_min.value()
         options['dur_max'] = self.duration_max.value()
         new_films = self.db.get_films(options)
@@ -100,7 +100,7 @@ class Db:
         return self.all_gen()[genre_id]
 
     def get_id_genre(self, genre: str):
-        new_dict = {val: key for key, val in self.all_genres().items()}
+        new_dict = {val: key for key, val in self.all_gen().items()}
         return new_dict[genre]
 
     def get_films(self, options: dict):
