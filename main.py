@@ -136,7 +136,7 @@ class Db:
     def add_new_film(self, values: dict):
         values['genre'] = self.get_id_genre(values['genre'])
         values = tuple([self.max_id() + 1] + list(values.values()))
-        self.__cursor.execute("""INSERT INTO films VALUES(?)""", tuple(values))
+        self.__cursor.execute("""INSERT INTO films VALUES(?, ?, ?, ?, ?)""", values)
         self.__connect.commit()
 
     def delete_films(self, films_id: list):
@@ -159,17 +159,18 @@ class AddNewFilm(QDialog, Ui_Dialog):
         self.setupUi(self)
         self.db = Db()
         self.genre.addItems(list(self.db.all_gen().values()))
-        self.buttonBox.accepted.connect(self.add_film)
+        self.pushButton.clicked.connect(self.add_film)
 
     def add_film(self):
         title = self.title.text()
-        year = self.year_spinbox.value()
-        duration = self.time_spinbox.value()
+        year = self.year_spinBox.value()
+        duration = self.time_spinBox.value()
         genre = self.genre.currentText()
         values = {'title': title, 'year': year, 'genre': genre, 'duration': duration}
         self.db.add_new_film(values)
 
 # --------------------------------------------------
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
