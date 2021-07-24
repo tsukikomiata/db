@@ -46,7 +46,7 @@ class Table(QMainWindow, Ui_MainWindow):
 
     def search(self):
         options = dict()
-        options['title'] = self.title_insert.text()
+        options['title'] = self.title.text()
         options['genre'] = self.genre.currentText()
         options['year'] = self.year.currentText()
         options['dur_min'] = self.duration_min.value()
@@ -117,11 +117,12 @@ class Db:
         if genre:
             select_str += """ AND genre = ?"""
             values.append(genre)
-        if year:
+        if dur_max:
             select_str += """ AND duration BETWEEN ? AND ?"""
             values.append(options['dur_min'])
             values.append(dur_max)
-        return self.__cursor.execute(select_str, tuple(values))
+        print(select_str)
+        return self.__cursor.execute(select_str, tuple(values)).fetchall()
 
     def update_value(self, old_val: str, new_val: str, film_id: int):
         self.__cursor.execute( """UPDATE films SET ? = ? WHERE id = ?""", tuple(old_val, new_val, film_id))
